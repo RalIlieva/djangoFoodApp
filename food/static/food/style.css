@@ -1,3 +1,7 @@
 body{
     background-color: lightyellow;
 }
+
+.nav-item {
+    margin-right: 10px; /* Adjust the margin as needed */
+}
