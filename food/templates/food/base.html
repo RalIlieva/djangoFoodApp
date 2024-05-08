@@ -12,8 +12,8 @@
     <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
         <a href="#" class="navbar-brand">Food App</a>
         <div class="navbar">
-            <a class="nav-item" href="#">Menu Item</a>
-            <a class="nav-item" href="#">Add Item</a>
+            <a class="nav-item" href="{% url 'food:index' %}">Menu Item</a>
+            <a class="nav-item" href="{% url 'food:create_item' %}">Add Item</a>
             <a class="nav-item" href="#">Delete Item</a>
             <a class="nav-item" href="#">View Item</a>
         </div>
