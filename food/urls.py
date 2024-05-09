@@ -6,8 +6,9 @@ urlpatterns =[
     path('', views.IndexClassView.as_view(), name='index'),
     # # /food/ - initial version
     # path('', views.index, name='index'),
-    # /food/1
-    path('<int:item_id>/', views.detail, name='detail'),
+    path('<int:pk>/', views.FoodDetail.as_view(), name='detail'),
+    # # /food/1 - intial version for the detail view
+    # path('<int:item_id>/', views.detail, name='detail'),
     path('item/', views.item, name='item'),
     # add items - form
     path('add', views.create_item, name='create_item'),
