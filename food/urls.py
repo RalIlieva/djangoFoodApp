@@ -10,8 +10,9 @@ urlpatterns =[
     # # /food/1 - intial version for the detail view
     # path('<int:item_id>/', views.detail, name='detail'),
     path('item/', views.item, name='item'),
-    # add items - form
-    path('add', views.create_item, name='create_item'),
+    path('add', views.CreateItem.as_view(), name='create_item'),
+    # # add items - form - intial version
+    # path('add', views.create_item, name='create_item'),
     # edit items
     path('update/<int:id>/', views.update_item, name='update_item'),
     # delete
