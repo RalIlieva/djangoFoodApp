@@ -42,7 +42,8 @@ class FoodDetail(DetailView):
 # Generic Create View
 class CreateItem(CreateView):
     model = Item
-    fields = ['item_name', 'item_desc', 'item_price', 'item_image']
+    form_class = ItemForm
+    # fields = ['item_name', 'item_desc', 'item_price', 'item_image']
     template_name = 'food/item-form.html'
 
     def form_valid(self, form):
