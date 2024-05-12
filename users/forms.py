@@ -8,3 +8,20 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
+        labels = {
+            "username": "Username",
+            'email': 'Email',
+            'password1': "Password",
+            'password2': "Confirm password",
+        }
+
+# class RegisterForm(UserCreationForm):
+#     username = forms.CharField(label='Username', max_length=50)
+#     email = forms.EmailField()
+#     password1 = forms.CharField()
+#     password2 = forms.PasswordInput()
+#
+#     class Meta:
+#         model = User
+#         fields = ['username', 'email', 'password1', 'password2']
+
