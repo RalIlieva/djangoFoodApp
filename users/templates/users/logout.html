@@ -1,1 +1,12 @@
-<h1>You have been logout!</h1>
+{% extends 'food/base.html' %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 offset-md-4">
+            <h1>You have been logout!</h1>
+            <a href="{% url 'food:index' %}" class="btn btn-primary rounded-pill px-3" >Back</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

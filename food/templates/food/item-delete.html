@@ -6,6 +6,7 @@
     <div class="container">
        <h2>Are you sure you want to delete: {{ item.item_name }}</h2>
         <button type="submit" class="btn btn-danger rounded-pill px-3">Confirm</button>
+        <a href="{% url 'food:index' %}" class="btn btn-primary rounded-pill px-3" >Back</a>
      </div>
 </form>
 </div>
