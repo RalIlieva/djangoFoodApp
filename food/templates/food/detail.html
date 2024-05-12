@@ -10,12 +10,12 @@
             <h1>{{ object.item_name }}</h1>
             <h2>{{ object.item_desc }}</h2>
             <h3>${{ object.item_price }}</h3>
+            {% if user.is_authenticated %}
             <a href="{% url 'food:update_item' item.id %}">Update</a>
             <a href="{% url 'food:delete_item' item.id %}">Delete</a>
+            {% endif %}
         </div>
     </div>
 
 </div>
 {% endblock %}
-
-<!--Intital version -  <h1>{{ item.item_name }}</h1> replaced with object.item_name, etc -->
