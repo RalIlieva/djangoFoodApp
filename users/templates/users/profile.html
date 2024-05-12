@@ -5,6 +5,7 @@
     <div class="col-md-4">
         <h1>Hello, {{ user.username }}!</h1>
         <h2>This is your profile page</h2>
+        <h3>Location: {{ user.profile.location }}</h3>
         <img src="{{ user.profile.image.url }}" height="350px" width="350px">
     </div>
   </div>
