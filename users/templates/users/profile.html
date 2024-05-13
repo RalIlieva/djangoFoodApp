@@ -1,6 +1,25 @@
 {% extends 'food/base.html' %}
 {% block body %}
 <div class="container">
+    <div class="col-md-4">
+        <div class="row">
+            {% if user == profile.user %}
+                <h1>Hello, {{ user.username }}!</h1>
+                <h2>This is your profile page</h2>
+                <h3>Location: {{ user.profile.location }}</h3>
+                <img src="{{ user.profile.image.url }}" height="350px" width="350px">
+            {% else %}
+                <h1>Profile of {{ username }}</h1>
+                <h3>Location: {{ profile.location }}</h3>
+                <img src="{{ profile.image.url }}" height="350px" width="350px">
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!--Initial version-->
+<!--<div class="container">
   <div class="row">
     <div class="col-md-4">
         <h1>Hello, {{ user.username }}!</h1>
@@ -9,6 +28,4 @@
         <img src="{{ user.profile.image.url }}" height="350px" width="350px">
     </div>
   </div>
-</div>
-{% endblock %}
-
+</div>-->
