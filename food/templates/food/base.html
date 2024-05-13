@@ -16,7 +16,7 @@
             <a class="nav-link text-white" href="{% url 'food:index' %}">Menu Item</a>
             {% if user.is_authenticated %}
                 <a class="nav-link text-white" href="{% url 'food:create_item' %}">Add Item</a>
-                <a href="{% url 'profile' %}" class="nav-link text-white">Profile</a>
+                <a href="{% url 'profile' username=request.user.username %}" class="nav-link text-white">Profile</a>
                 <a href="{% url 'logout' %}" type="button" class="btn btn-outline-light me-2">Logout</a>
             {% else %}
                 <a href="{% url 'login' %}" type="button" class="btn btn-outline-light me-2" >Login</a>
