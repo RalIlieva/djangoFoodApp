@@ -19,6 +19,7 @@
                 <h5>{{ item.item_desc }}</h5>
                 <h6>${{ item.item_price }}</h6>
                 <h6>{{ item.user_name }}</h6>
+                <a href="{% url 'profile' username=item.user_name  %}">{{ item.user_name }}</a>
             </div>
             <div class="col-md-2">
                 <a href="{% url 'food:detail' item.id %}" class="btn btn-primary">Details</a>
@@ -28,3 +29,4 @@
 {% endblock %}
 </body>
 </html>
+
