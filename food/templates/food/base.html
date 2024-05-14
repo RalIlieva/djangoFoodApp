@@ -1,5 +1,5 @@
 {% load static %}
-<!DOCTYPE html>
+<!--<!DOCTYPE html>-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,9 +13,9 @@
     <div class="container-fluid">
         <a href="#" class="navbar-brand">Food App</a>
         <div class="nav">
-            <a class="nav-link text-white" href="{% url 'food:index' %}">Menu Item</a>
+            <a class="nav-link text-white" href="{% url 'food:index' %}">Recipes</a>
             {% if user.is_authenticated %}
-                <a class="nav-link text-white" href="{% url 'food:create_item' %}">Add Item</a>
+                <a class="nav-link text-white" href="{% url 'food:create_item' %}">Add Recipe</a>
                 <a href="{% url 'profile' username=request.user.username %}" class="nav-link text-white">Profile</a>
                 <a href="{% url 'logout' %}" type="button" class="btn btn-outline-light me-2">Logout</a>
             {% else %}
