@@ -6,12 +6,19 @@ from django.template import loader
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
+from django.db.models import Avg
 
 # ClassBased View
 class IndexClassView(ListView):
     model = Item
+    # item_list = Item.objects.filter(ratings__isnull=False).order_by('-ratings__average')
     template_name = 'food/index.html'
     context_object_name = 'item_list'
+
+    # def get_queryset(self):
+    #     queryset = Item.objects.filter(ratings__isnull=False).order_by('ratings__average')
+    #     return queryset
+
 
 # Initial version
 # def index(request):
