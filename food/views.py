@@ -15,9 +15,10 @@ class IndexClassView(ListView):
     template_name = 'food/index.html'
     context_object_name = 'item_list'
 
-    # def get_queryset(self):
-    #     queryset = Item.objects.filter(ratings__isnull=False).order_by('ratings__average')
-    #     return queryset
+    def get_queryset(self):
+        # add - in front of ratings to make descending order - first the highest rating
+        queryset = Item.objects.filter(ratings__isnull=False).order_by('-ratings__average')
+        return queryset
 
 
 # Initial version
