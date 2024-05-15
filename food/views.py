@@ -36,20 +36,23 @@ class FoodDetail(DetailView):
 
         comments = item.comments.all()
         context['comments'] = comments
-
-        if self.request.method == 'POST':
-            comment_form = CommentForm(self.request.POST)
-            if comment_form.is_valid():
-                comment = comment_form.save(commit=False)
-                comment.user = self.request.user
-                comment.item = item
-                comment.save()
-                return redirect('food:detail', pk=item.pk)
-        else:
-            comment_form = CommentForm()
-
-        context['comment_form'] = comment_form
+        context['comment_form'] = CommentForm()
         return context
+
+    def post(self, request, *args, **kwargs):
+        item = self.get_object()
+        comment_form = CommentForm(request.POST)
+
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.user = request.user
+            comment.item = item
+            comment.save()
+            return redirect('food:detail', pk=item.pk)
+        else:
+            context = self.get_context_data()
+            context['comment_form'] = comment_form
+            return self.render_to_response(context)
 
 
 # Generic Create View

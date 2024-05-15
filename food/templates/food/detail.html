@@ -4,21 +4,29 @@
 {% block body %}
 <div class="container">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <img src="{{ item.item_image }}" height="300px" width="300px" class="card">
         </div>
-        <div class="col-md-6">
+        <div class="col-md-8">
             <h1>Recipe: {{ object.item_name }}</h1>
-            <h2>Description: {{ object.item_desc }}</h2>
+            <h6>Description: {{ object.item_desc }}</h6>
             <p>Cooking time {{ object.cooking_time }}</p>
             <p>Views: {{ object.views }}</p>
             <p>Published on: {{ object.publish_date }}</p>
+            {% if object.update_date %}
+            <p>Last updated: {{ object.update_date }}</p>
+            {% endif %}
 
+            {% if item.user_name == user %}
+                <a href="{% url 'food:update_item' item.id %}">Update</a>
+                <a href="{% url 'food:delete_item' item.id %}">Delete</a>
+            {% endif %}
+                <br>
             <h6>
                 {% ratings object %}
             </h6>
 
-            <h2>Comments</h2>
+            <h6>Comments</h6>
                 <div id="comments">
                 {% for comment in comments %}
                     <div class="comment">
@@ -30,17 +38,12 @@
                 {% endfor %}
                  </div>
 
-            <h2>Add a comment</h2>
+            <h6>Add a comment</h6>
                 <form method="post">
                 {% csrf_token %}
                 {{ comment_form.as_p }}
-                <button type="submit">Submit</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
-
-            {% if item.user_name == user %}
-            <a href="{% url 'food:update_item' item.id %}">Update</a>
-            <a href="{% url 'food:delete_item' item.id %}">Delete</a>
-            {% endif %}
         </div>
     </div>
 
