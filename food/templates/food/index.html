@@ -18,12 +18,12 @@
             <div class="col-md-4">
                 <h3>{{ item.item_name }}</h3>
                 <h5>{{ item.item_desc }}</h5>
-                <p>Views {{ item.views}} | Cooking time {{ item.cooking_time }} | Published on: {{ item.publish_date }}</p>
+                <p>Views {{ item.views}} | Published on {{ item.publish_date|date:"d F Y" }} | By
+                    <a href="{% url 'profile' username=item.user_name  %}">{{ item.user_name }}</a>
+                </p>
                 <p>
-                    {% load ratings %}
                     {% ratings item %}
                 </p>
-                <a href="{% url 'profile' username=item.user_name  %}">{{ item.user_name }}</a>
             </div>
             <div class="col-md-2">
                 <a href="{% url 'food:detail' item.id %}" class="btn btn-primary">View</a>
