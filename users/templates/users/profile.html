@@ -13,6 +13,21 @@
                 <h3>Location: {{ profile.location }}</h3>
                 <img src="{{ profile.image.url }}" height="350px" width="350px">
             {% endif %}
+            <div class="col-md-4">
+                <div class="row">
+<!--                    <h2>Recipes</h2>
+                    {% if items %}
+                        <ul>
+                            {% for item in items %}
+                                <li>
+                                    <a href="{{ item.get_absolute_url }}">{{ item.item_name }}</a>
+                                    <p>{{ item.item_desc }}</p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No recipes found.</p>
+                    {% endif %}-->
         </div>
     </div>
 </div>
@@ -27,5 +42,5 @@
         <h3>Location: {{ user.profile.location }}</h3>
         <img src="{{ user.profile.image.url }}" height="350px" width="350px">
     </div>
-  </div>
+    </div>
 </div>-->

@@ -25,7 +25,4 @@ def profilepage(request, username=None):
     username = get_object_or_404(User, username=username)
     user = get_object_or_404(User, username=username)
     profile = get_object_or_404(Profile, user=user)
-    return render(request, 'users/profile.html', {'profile': profile, 'username': username})
-
-    # return render(request, 'users/profile.html', {'username': username})
-
+    return render(request, 'users/profile.html', {'profile': profile, 'username': username, })

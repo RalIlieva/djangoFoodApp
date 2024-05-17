@@ -8,15 +8,22 @@
             <img src="{{ item.item_image }}" height="300px" width="300px" class="card">
         </div>
         <div class="col-md-8">
-            <h1 class="kur">Recipe: {{ object.item_name }}</h1>
-            <h6>Description: {{ object.item_desc }}</h6>
-            <p>Cooking time {{ object.cooking_time }}</p>
-            <p>Views: {{ object.views }}</p>
-            <p>Published on: {{ object.publish_date }}</p>
-            {% if object.update_date %}
-            <p>Last updated: {{ object.update_date }}</p>
-            {% endif %}
+            <h1 class="kur">Recipe: #{{ object.id }}</h1>
+            <div class="card my-4">
+                <div class="card-body">
+                    <h5 class="card-title">{{ object.item_name}}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted"> Author
+                        <a href="{% url 'profile' username=item.user_name  %}">{{ object.user_name }}</a></h6>
+                    <p class="card-text">Description: {{ object.item_desc }}</p>
+                    <p class="card-subtitle mb-2 text-muted">Published on: {{ object.publish_date|date:"d F Y"  }}</p>
+                        {% if object.update_date %}
+                    <p class="card-subtitle mb-2 text-muted">Last updated: {{ object.update_date|date:"d F Y"  }}</p>
+                        {% endif %}
+                    <p class="card-subtitle mb-2 text-muted">Cooking time {{ object.cooking_time }}</p>
+                    <p class="card-subtitle mb-2 text-muted">Views: {{ object.views }}</p>
 
+                </div>
+            </div>
             {% if item.user_name == user %}
                 <a href="{% url 'food:update_item' item.id %}">Update</a>
                 <a href="{% url 'food:delete_item' item.id %}">Delete</a>
@@ -34,20 +41,24 @@
 
             <h6>Comments</h6>
                 <div id="comments">
-                    <table class=" table table-hover">
-                        <tr>
-                            <td>
+                    <table class="table table-hover">
                             {% for comment in comments %}
-                                <div class="comment">
-                                <p>{{ comment.text }}</p>
-                                <p><small>by {{ comment.user.username }} on {{ comment.created_at }}</small></p>
-                                </div>
+                                <tr>
+                                    <td>
+                                        <div class="comment">
+                                            <p>{{ comment.text }}</p>
+                                            <p><small>by {{ comment.user.username }} on {{ comment.created_at }}</small></p>
+                                        </div>
+                                    </td>
+                                </tr>
                             {% empty %}
-                                <p>No comments yet.</p>
+                                <tr>
+                                    <td>
+                                        <p>No comments yet.</p>
+                                    </td>
+                                </tr>
                             {% endfor %}
-                            </td>
-                        </tr>
-                    </table>
+                        </table>
                  </div>
 
                 <form method="post">
