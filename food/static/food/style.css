@@ -1,10 +1,11 @@
 .kur {
     color: #212529;
     transition: color 0.3s ease;
+    text-decoration: none;
 }
 
 .kur:hover {
-    color: #0085A1; /* Change color on hover */
+    color: #fc8803; /* Change color on hover */
     text-decoration: none;
     cursor: pointer;
 }
