@@ -30,6 +30,7 @@ urlpatterns = [
     path('logout/', authentication_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
     path('profile/<str:username>/', user_views.profilepage, name='profile'),
     path('ratings/', include('star_ratings.urls', namespace='ratings')),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 ]
 
 # Copy this code from documentation - how to display images in development serve

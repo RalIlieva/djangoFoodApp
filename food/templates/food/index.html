@@ -18,7 +18,7 @@
             <div class="col-md-4">
                 <h3>
                     <a href="{{ item.get_absolute_url }}" class="kur">{{ item.item_name }}</a></h3>
-                <h5>{{ item.item_desc }}</h5>
+<!--                <h5>{{ item.item_desc | safe}}</h5>-->
                 <p>Views {{ item.views}} | Published on {{ item.publish_date|date:"d F Y" }} | By
                     <a href="{% url 'profile' username=item.user_name  %}">{{ item.user_name }}</a>
                 </p>

@@ -4,12 +4,13 @@ from django.urls import reverse
 from django.contrib.contenttypes.fields import GenericRelation
 from star_ratings.models import Rating
 from django.utils import timezone
-
+from ckeditor.fields import RichTextField
 # Create your models here.
+
 class Item(models.Model):
     user_name = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     item_name = models.CharField(max_length=200)
-    item_desc = models.CharField(max_length=200)
+    item_desc = RichTextField(max_length=2000)
     item_image = models.CharField(max_length=550, default='https://cdn-icons-png.flaticon.com/512/1147/1147805.png')
     ratings = GenericRelation(Rating, related_query_name='items')
     publish_date = models.DateTimeField(default=timezone.now)

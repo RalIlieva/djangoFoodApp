@@ -14,7 +14,7 @@
                     <h5 class="card-title">{{ object.item_name}}</h5>
                     <h6 class="card-subtitle mb-2 text-muted"> Author
                         <a href="{% url 'profile' username=item.user_name  %}">{{ object.user_name }}</a></h6>
-                    <p class="card-text">Description: {{ object.item_desc }}</p>
+                    <p class="card-text">Description: {{ object.item_desc | safe }}</p>
                     <p class="card-subtitle mb-2 text-muted">Published on: {{ object.publish_date|date:"d F Y"  }}</p>
                         {% if object.update_date %}
                     <p class="card-subtitle mb-2 text-muted">Last updated: {{ object.update_date|date:"d F Y"  }}</p>
