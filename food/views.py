@@ -1,5 +1,6 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, HttpResponseForbidden
 from .models import Item, Comment
 from .forms import ItemForm, CommentForm
 from django.template import loader
@@ -87,3 +88,13 @@ def delete_item(request, id):
         return redirect('food:index')
 
     return render(request, 'food/item-delete.html', {'item':item})
+
+
+@login_required
+def delete_comment(request, item_pk, comment_pk):
+    comment = get_object_or_404(Comment, pk=comment_pk, item_id=item_pk)
+    if comment.user != request.user:
+        return HttpResponseForbidden("You are not allowed to delete this comment.")
+
+    comment.delete()
+    return redirect('food:detail', pk=item_pk)

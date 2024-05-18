@@ -12,4 +12,5 @@ urlpatterns =[
     path('update/<int:id>/', views.update_item, name='update_item'),
     # delete
     path('delete/<int:id>/', views.delete_item, name='delete_item'),
+    path('item/<int:item_pk>/comment/<int:comment_pk>/delete/', views.delete_comment, name='delete_comment'),
 ]

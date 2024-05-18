@@ -48,6 +48,12 @@
                                         <div class="comment">
                                             <p>{{ comment.text }}</p>
                                             <p><small>by {{ comment.user.username }} on {{ comment.created_at }}</small></p>
+                                                {% if comment.user == request.user %}
+                                                    <form action="{% url 'food:delete_comment' item.pk comment.pk %}" method="post" style="display:inline;">
+                                                {% csrf_token %}
+                                                    <button type="submit" class="btn btn-primary">Delete</button>
+                                                    </form>
+                                        {% endif %}
                                         </div>
                                     </td>
                                 </tr>
