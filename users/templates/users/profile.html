@@ -33,6 +33,10 @@
                             {% for item in items %}
                                 <li class="list-group-item">
                                     <a href="{{ item.get_absolute_url }}">{{ item.item_name }}</a>
+                                    <span>, published on {{ item.publish_date|date:"d F Y"  }}</span>
+                                    {% if item.update_date != publish_date %}
+                                    <span>, last update {{ item.update_date|date:"d F Y"  }}</span>
+                                    {% endif %}
                                 </li>
                             {% endfor %}
                         </ul>
