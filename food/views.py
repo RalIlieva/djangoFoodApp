@@ -80,6 +80,8 @@ def update_item(request, id):
     return render(request,'food/item-form.html',{'form': form,'item': item})
 
 
+# First approach for deletion - with html for confirmation and check in html
+@login_required
 def delete_item(request, id):
     item = Item.objects.get(id=id)
 
@@ -87,9 +89,10 @@ def delete_item(request, id):
         item.delete()
         return redirect('food:index')
 
-    return render(request, 'food/item-delete.html', {'item':item})
+    return render(request, 'food/item-delete.html', {'item': item})
 
 
+# Second approach for deletion - checks are here, no confirmation - JS needed.
 @login_required
 def delete_comment(request, item_pk, comment_pk):
     comment = get_object_or_404(Comment, pk=comment_pk, item_id=item_pk)
