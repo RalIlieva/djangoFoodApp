@@ -1,36 +1,46 @@
 {% extends 'food/base.html' %}
 {% block body %}
-<div class="container">
+<div class="container mt-4">
     <div class="row">
-        <div class="col-4">
-            {% if user == profile.user %}
-                <h1>Hello, {{ user.username }}!</h1>
-                <h2>This is your profile page</h2>
-                <h3>Location: {{ user.profile.location }}</h3>
-                <img src="{{ user.profile.image.url }}" height="150px" width="150px">
-            {% else %}
-                <h1>Profile of {{ username }}</h1>
-                <h3>Location: {{ profile.location }}</h3>
-                <img src="{{ profile.image.url }}" height="150px" width="150px">
-            {% endif %}
+        <!-- Profile Information Column -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    {% if user == profile.user %}
+                        <h1 class="card-title">Hello, {{ user.username }}!</h1>
+                        <h2 class="card-subtitle mb-2 text-muted">This is your profile page</h2>
+                        <h3 class="card-text">Location: {{ user.profile.location }}</h3>
+                        <img src="{{ user.profile.image.url }}" class="img-fluid rounded-circle mb-3" alt="Profile Image" style="width: 150px; height: 150px;">
+                    {% else %}
+                        <h1 class="card-title">Profile of {{ username }}</h1>
+                        <h3 class="card-text">Location: {{ profile.location }}</h3>
+                        <img src="{{ profile.image.url }}" class="img-fluid rounded-circle mb-3" alt="Profile Image" style="width: 150px; height: 150px;">
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <div class="col-8">
-            {% if user == profile.user %}
-            <h2>My Recipes</h2>
-            {% else %}
-            <h2>Recipes</h2>
-            {% endif %}
-                {% if items %}
-                <ul>
-                {% for item in items %}
-                    <li>
-                        <a href="{{ item.get_absolute_url }}">{{ item.item_name }}</a>
-                    </li>
-                {% endfor %}
-                </ul>
-                {% else %}
-                <p>No recipes found.</p>
-                {% endif %}
+        <!-- Recipes Column -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    {% if user == profile.user %}
+                    <h2 class="card-title">My Recipes</h2>
+                    {% else %}
+                    <h2 class="card-title">Recipes</h2>
+                    {% endif %}
+                    {% if items %}
+                        <ul class="list-group list-group-flush">
+                            {% for item in items %}
+                                <li class="list-group-item">
+                                    <a href="{{ item.get_absolute_url }}">{{ item.item_name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="card-text">No recipes found.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
