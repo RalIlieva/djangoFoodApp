@@ -5,6 +5,7 @@ from django.contrib import messages
 from .forms import RegisterForm
 from django.contrib.auth.models import User
 from .models import Profile
+from food.models import Item
 
 
 def register(request):
@@ -25,4 +26,5 @@ def profilepage(request, username=None):
     username = get_object_or_404(User, username=username)
     user = get_object_or_404(User, username=username)
     profile = get_object_or_404(Profile, user=user)
-    return render(request, 'users/profile.html', {'profile': profile, 'username': username, })
+    items = Item.objects.filter(user_name=user)
+    return render(request, 'users/profile.html', {'profile': profile, 'username': username, 'items': items})
