@@ -9,12 +9,14 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.db.models import Avg
 from django.utils import timezone
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # ClassBased View
 class IndexClassView(ListView):
     model = Item
     template_name = 'food/index.html'
     context_object_name = 'item_list'
+    paginate_by = 3
 
     def get_queryset(self):
         # add - in front of ratings to make descending order - first the highest rating

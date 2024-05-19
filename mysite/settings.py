@@ -132,3 +132,6 @@ LOGIN_URL = 'login'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'pictures')
 MEDIA_URL = '/pictures/'
 CKEDITOR_UPLOAD_PATH = "uploads/"
+
+# Pagination settings
+PAGINATION_PAGE_SIZE = 3
