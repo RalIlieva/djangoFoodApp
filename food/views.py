@@ -11,6 +11,7 @@ from django.db.models import Avg
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
+from django.contrib import messages
 
 # ClassBased View
 class IndexClassView(ListView):
@@ -30,6 +31,9 @@ class IndexClassView(ListView):
                 Q(item_desc__icontains=query) |
                 Q(user_name__username__icontains=query)
             )
+
+        if not queryset.exists():  # If no results found
+            messages.info(self.request, 'No results found.')
 
         return queryset
 
