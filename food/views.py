@@ -10,6 +10,7 @@ from django.views.generic.edit import CreateView
 from django.db.models import Avg
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 
 # ClassBased View
 class IndexClassView(ListView):
@@ -19,8 +20,17 @@ class IndexClassView(ListView):
     paginate_by = 3
 
     def get_queryset(self):
+        query = self.request.GET.get('q')
         # add - in front of ratings to make descending order - first the highest rating
         queryset = Item.objects.filter(ratings__isnull=False).order_by('-ratings__average')
+
+        if query:
+            queryset = queryset.filter(
+                Q(item_name__icontains=query) |
+                Q(item_desc__icontains=query)
+
+                  )
+
         return queryset
 
 
