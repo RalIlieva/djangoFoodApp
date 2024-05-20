@@ -27,9 +27,9 @@ class IndexClassView(ListView):
         if query:
             queryset = queryset.filter(
                 Q(item_name__icontains=query) |
-                Q(item_desc__icontains=query)
-
-                  )
+                Q(item_desc__icontains=query) |
+                Q(user_name__username__icontains=query)
+            )
 
         return queryset
 
