@@ -9,9 +9,10 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.db.models import Avg
 from django.utils import timezone
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.contrib import messages
+# used only for function-based views - manually set the pagination
+# from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # ClassBased View
 class IndexClassView(ListView):
