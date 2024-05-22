@@ -6,11 +6,12 @@ from .forms import ItemForm, CommentForm
 from django.template import loader
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.db.models import Avg
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib import messages
+from django.urls import reverse_lazy
 # used only for function-based views - manually set the pagination
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -87,16 +88,27 @@ class CreateItem(CreateView):
         return super().form_valid(form)
 
 
-def update_item(request, id):
-    item = Item.objects.get(id=id)
-    form = ItemForm(request.POST or None, instance=item)
+class UpdateItem(UpdateView):
+    model = Item
+    form_class = ItemForm
+    template_name = 'food/item-form.html'
+    success_url = reverse_lazy('food:index')
 
-    if form.is_valid():
+    def form_valid(self, form):
         form.instance.update_date = timezone.now()
-        form.save()
-        return redirect('food:index')
+        return super().form_valid(form)
 
-    return render(request,'food/item-form.html',{'form': form,'item': item})
+# Initial version
+# def update_item(request, id):
+#     item = Item.objects.get(id=id)
+#     form = ItemForm(request.POST or None, instance=item)
+#
+#     if form.is_valid():
+#         form.instance.update_date = timezone.now()
+#         form.save()
+#         return redirect('food:index')
+#
+#     return render(request,'food/item-form.html',{'form': form,'item': item})
 
 
 # First approach for deletion - with html for confirmation and check in html
