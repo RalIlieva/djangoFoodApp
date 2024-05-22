@@ -4,8 +4,10 @@ from django.urls import reverse
 from datetime import timedelta
 from .models import Item, Comment
 from .forms import CommentForm, ItemForm
+from .views import UpdateItem
 from star_ratings.models import Rating
 from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
 
 class IndexViewTest(TestCase):
     @classmethod
@@ -184,4 +186,60 @@ class CreateItemViewTest(TestCase):
         # Test creating item without being logged in
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, f'/login/?next={self.url}')
+
+
+class UpdateItemViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.item = Item.objects.create(
+            user_name=self.user,
+            item_name='Original Item',
+            item_desc='Original Description',
+            item_image='https://example.com/image.png',
+            cooking_time=timedelta(minutes=30),
+            publish_date=timezone.now()
+        )
+        self.url = reverse('food:update_item', args=[self.item.pk])
+
+    def test_update_item_get_with_login(self):
+        self.client.login(username='testuser', password='testpassword')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'food/item-form.html')
+        self.assertContains(response, 'Original Item')
+
+    def test_update_item_post_with_valid_data(self):
+        self.client.login(username='testuser', password='testpassword')
+        data = {
+            'item_name': 'Updated Item',
+            'item_desc': 'Updated Description',
+            'item_image': 'https://example.com/new_image.png',
+            'cooking_time': '00:45:00',
+        }
+        response = self.client.post(self.url, data)
+        self.assertRedirects(response, reverse('food:index'))
+        self.item.refresh_from_db()
+        self.assertEqual(self.item.item_name, 'Updated Item')
+        self.assertEqual(self.item.item_desc, 'Updated Description')
+
+
+    def test_update_item_post_with_invalid_data(self):
+        self.client.login(username='testuser', password='testpassword')
+        data = {
+            'item_name': '',  # Invalid data (empty item_name)
+            'item_desc': 'Updated Description',
+            'item_image': 'https://example.com/new_image.png',
+            'cooking_time': '00:45:00',
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 200)  # Form re-rendered with errors
+        self.assertTemplateUsed(response, 'food/item-form.html')
+        self.assertContains(response, 'This field is required.')
+        self.item.refresh_from_db()
+        self.assertNotEqual(self.item.item_name, '')  # Ensure the item was not updated
+
+    def test_update_item_get_without_login(self):
+        response = self.client.get(self.url)
+        # self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, f'/login/?next={self.url}')

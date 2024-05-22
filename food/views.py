@@ -89,7 +89,7 @@ class CreateItem(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class UpdateItem(UpdateView):
+class UpdateItem(LoginRequiredMixin, UpdateView):
     model = Item
     form_class = ItemForm
     template_name = 'food/item-form.html'
