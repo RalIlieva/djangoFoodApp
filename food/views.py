@@ -58,7 +58,9 @@ class FoodDetail(DetailView):
         return context
 
     def post(self, request, *args, **kwargs):
-        item = self.get_object()
+        # item = self.get_object()
+        self.object = self.get_object()  # Ensure self.object is set
+        item = self.object
         comment_form = CommentForm(request.POST)
 
         if comment_form.is_valid():

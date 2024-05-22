@@ -125,10 +125,12 @@ class FoodDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Comment.objects.filter(item=self.item1).count(), 2)
 
-    # def test_post_comment_invalid(self):
-    #     self.client.login(username='testuser', password='testpass')
-    #     response = self.client.post(reverse('food:detail', kwargs={'pk': self.item1.pk}), {
-    #         'text': ''  # Invalid because content is required
-    #     })
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertFormError(response, 'comment_form', 'text', 'This field is required.')
+    def test_post_comment_invalid(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(reverse('food:detail', kwargs={'pk': self.item1.pk}), {
+            'text': ''  # Invalid because content is required
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response, 'comment_form', 'text', 'This field is required.')
+
+
