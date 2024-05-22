@@ -67,20 +67,26 @@
                         </table>
                  </div>
 
-                <form method="post">
-                {% csrf_token %}
-                {{ comment_form.as_p }}
-                     {% if comment_form.non_field_errors %}
-                    <div class="alert alert-danger" role="alert">
-                        <ul>
-                            {% for error in comment_form.non_field_errors %}
-                            <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ comment_form.as_p }}
+                        {% if comment_form.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                <ul>
+                                    {% for field in comment_form %}
+                                        {% for error in field.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% for error in comment_form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
                         {% endif %}
-                <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+
             </div>
         </div>
     </div>
