@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden
 from .models import Item, Comment
@@ -77,7 +78,7 @@ class FoodDetail(DetailView):
 
 
 # Generic Create View
-class CreateItem(CreateView):
+class CreateItem(LoginRequiredMixin, CreateView):
     model = Item
     form_class = ItemForm
     template_name = 'food/item-form.html'

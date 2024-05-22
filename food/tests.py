@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from datetime import timedelta
 from .models import Item, Comment
-from .forms import CommentForm
+from .forms import CommentForm, ItemForm
 from star_ratings.models import Rating
 from django.contrib.contenttypes.models import ContentType
 
@@ -134,3 +134,54 @@ class FoodDetailViewTest(TestCase):
         self.assertFormError(response, 'comment_form', 'text', 'This field is required.')
 
 
+class CreateItemViewTest(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.url = reverse('food:create_item')
+        self.valid_item_data = {
+            'item_name': 'Test Item',
+            'item_desc': 'Test description',
+            'item_image': 'https://cdn-icons-png.flaticon.com/512/1147/1147805.png',
+            'cooking_time': timedelta(minutes=30),
+        }
+
+    def test_create_item_get(self):
+        # Test GET request to the view
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'food/item-form.html')
+        # Verify the form is present in the response context
+        self.assertIn('form', response.context)
+        self.assertIsInstance(response.context['form'], ItemForm)
+
+        # Check if the rendered HTML contains the form fields
+        self.assertContains(response, 'name="item_name"')
+        self.assertContains(response, 'name="item_desc"')
+        self.assertContains(response, 'name="item_image"')
+        self.assertContains(response, 'name="cooking_time"')
+
+    def test_create_item_post_valid(self):
+        # Test POST request with valid data
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(self.url, self.valid_item_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Item.objects.filter(item_name='Test Item').exists())
+
+
+    def test_create_item_post_invalid(self):
+        # Test POST request with invalid data
+        self.client.login(username='testuser', password='testpass')
+        invalid_item_data = self.valid_item_data.copy()
+        invalid_item_data['item_name'] = ''  # Make it invalid by providing empty item_name
+        response = self.client.post(self.url, invalid_item_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Item.objects.filter(item_name='').exists())
+        self.assertContains(response, 'This field is required.')
+
+    def test_create_item_without_login(self):
+        # Test creating item without being logged in
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, f'/login/?next={self.url}')
