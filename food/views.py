@@ -7,7 +7,7 @@ from .forms import ItemForm, CommentForm
 from django.template import loader
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.db.models import Avg
 from django.utils import timezone
 from django.db.models import Q
@@ -112,16 +112,21 @@ class UpdateItem(LoginRequiredMixin, UpdateView):
 #     return render(request,'food/item-form.html',{'form': form,'item': item})
 
 
+class DeleteItem(LoginRequiredMixin, DeleteView):
+    model = Item
+    template_name = 'food/item-delete.html'
+    success_url = reverse_lazy('food:index')
+
 # First approach for deletion - with html for confirmation and check in html
-@login_required
-def delete_item(request, id):
-    item = Item.objects.get(id=id)
-
-    if request.method == 'POST':
-        item.delete()
-        return redirect('food:index')
-
-    return render(request, 'food/item-delete.html', {'item': item})
+# @login_required
+# def delete_item(request, id):
+#     item = Item.objects.get(id=id)
+#
+#     if request.method == 'POST':
+#         item.delete()
+#         return redirect('food:index')
+#
+#     return render(request, 'food/item-delete.html', {'item': item})
 
 
 # Second approach for deletion - checks are here, no confirmation - JS needed.
