@@ -1,0 +1,14 @@
+{% extends 'food/base.html' %}
+{% block body %}
+<div class="container">
+<form method="POST" action="{% url 'food:delete_comment' item_pk=comment.item.pk comment_pk=comment.pk %}>
+    {% csrf_token %}
+    <div class="container">
+       <h2>Are you sure you want to delete: {{ comment.text }}</h2>
+        <p>Item: {{ comment.item.item_name }}</p>
+        <button type="submit" class="btn btn-danger rounded-pill px-3">Confirm</button>
+        <a href="{% url 'food:detail' pk=comment.item.pk  %}" class="btn btn-primary rounded-pill px-3" >Back</a>
+     </div>
+</form>
+</div>
+{% endblock %}

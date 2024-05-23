@@ -141,12 +141,31 @@ class DeleteItem(LoginRequiredMixin, DeleteView):
 #     return render(request, 'food/item-delete.html', {'item': item})
 
 
-# Second approach for deletion - checks are here, no confirmation - JS needed.
-@login_required
-def delete_comment(request, item_pk, comment_pk):
-    comment = get_object_or_404(Comment, pk=comment_pk, item_id=item_pk)
-    if comment.user != request.user:
-        return HttpResponseForbidden("You are not allowed to delete this comment.")
+class DeleteComment(LoginRequiredMixin, DeleteView):
+    model = Comment
+    template_name = 'food/comment-delete.html'
+    context_object_name = 'comment'
 
-    comment.delete()
-    return redirect('food:detail', pk=item_pk)
+    def get_success_url(self):
+        return reverse_lazy('food:detail', kwargs={'pk': self.object.item.pk})
+
+    def get_object(self, queryset=None):
+        item_pk = self.kwargs.get('item_pk')
+        comment_pk = self.kwargs.get('comment_pk')
+        comment = get_object_or_404(Comment, pk=comment_pk, item_id=item_pk)
+        print("Comment object:", comment)
+
+        if comment.user != self.request.user:
+            return HttpResponseForbidden("You are not allowed to delete this comment.")
+        return comment
+
+
+# # Second approach for deletion - checks are here, no confirmation - JS needed.
+# @login_required
+# def delete_comment(request, item_pk, comment_pk):
+#     comment = get_object_or_404(Comment, pk=comment_pk, item_id=item_pk)
+#     if comment.user != request.user:
+#         return HttpResponseForbidden("You are not allowed to delete this comment.")
+#
+#     comment.delete()
+#     return redirect('food:detail', pk=item_pk)

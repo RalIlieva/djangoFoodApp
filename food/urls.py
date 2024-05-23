@@ -12,5 +12,6 @@ urlpatterns =[
     # delete
     # path('delete/<int:id>/', views.delete_item, name='delete_item'),
     path('delete/<int:pk>/', views.DeleteItem.as_view(), name='delete_item'),
-    path('item/<int:item_pk>/comment/<int:comment_pk>/delete/', views.delete_comment, name='delete_comment'),
+    # path('item/<int:item_pk>/comment/<int:comment_pk>/delete/', views.delete_comment, name='delete_comment'),
+    path('item/<int:item_pk>/comment/<int:comment_pk>/delete/', views.DeleteComment.as_view(), name='delete_comment'),
 ]
