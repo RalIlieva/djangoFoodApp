@@ -241,8 +241,8 @@ class UpdateItemViewTest(TestCase):
 
     def test_update_item_get_without_login(self):
         response = self.client.get(self.url)
-        # self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, f'/login/?next={self.url}')
+        self.assertEqual(response.status_code, 403)
+        # self.assertRedirects(response, f'/login/?next={self.url}')
 
 
 class DeleteItemViewTest(TestCase):

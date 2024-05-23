@@ -95,6 +95,12 @@ class UpdateItem(LoginRequiredMixin, UpdateView):
     template_name = 'food/item-form.html'
     success_url = reverse_lazy('food:index')
 
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.user_name != request.user:
+            return HttpResponseForbidden("You are not allowed to update this item.")
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         form.instance.update_date = timezone.now()
         return super().form_valid(form)
