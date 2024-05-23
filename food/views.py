@@ -117,6 +117,12 @@ class DeleteItem(LoginRequiredMixin, DeleteView):
     template_name = 'food/item-delete.html'
     success_url = reverse_lazy('food:index')
 
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.user_name != request.user:
+            return HttpResponseForbidden("You are not allowed to delete this item.")
+        return super().dispatch(request, *args, **kwargs)
+
 # First approach for deletion - with html for confirmation and check in html
 # @login_required
 # def delete_item(request, id):

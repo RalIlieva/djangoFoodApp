@@ -243,3 +243,61 @@ class UpdateItemViewTest(TestCase):
         response = self.client.get(self.url)
         # self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, f'/login/?next={self.url}')
+
+
+class DeleteItemViewTest(TestCase):
+    def setUp(self):
+        # Create a user and log them in
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')
+
+        # Create an item to be deleted
+        self.item = Item.objects.create(
+            user_name=self.user,
+            item_name='Test Item',
+            item_desc='Test Description',
+            item_image='https://cdn-icons-png.flaticon.com/512/1147/1147805.png',
+            cooking_time=timedelta(minutes=30)
+        )
+
+        # URL for the delete view
+        self.url = reverse('food:delete_item', args=[self.item.pk])
+
+    def test_delete_item_view_status_code(self):
+        # Test the delete view status code for GET request
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete_item_view_uses_correct_template(self):
+        # Test if the delete view uses the correct template
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'food/item-delete.html')
+
+    def test_delete_item_post_request(self):
+        # Test if the item is deleted on POST request
+        response = self.client.post(self.url)
+        self.assertRedirects(response, reverse('food:index'))
+        self.assertFalse(Item.objects.filter(pk=self.item.pk).exists())
+
+    def test_delete_item_view_by_another_user(self):
+        # Create another user
+        another_user = User.objects.create_user(username='anotheruser', password='testpass')
+        self.client.login(username='anotheruser', password='testpass')
+
+        # Test if another user cannot access the delete view
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+        # Test if another user cannot delete the item
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_item_view_without_login(self):
+        # Log out the user
+        self.client.logout()
+
+        # Attempt to access the delete view
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+
