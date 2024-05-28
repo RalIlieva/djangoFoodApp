@@ -1,7 +1,7 @@
 {% extends 'food/base.html' %}
 {% block body %}
 <div class="container">
-<form method="POST" action="{% url 'food:delete_comment' item_pk=comment.item.pk comment_pk=comment.pk %}>
+<form method="POST" action="{% url 'food:delete_comment' item_pk=comment.item.pk comment_pk=comment.pk %}">
     {% csrf_token %}
     <div class="container">
        <h2>Are you sure you want to delete: {{ comment.text }}</h2>

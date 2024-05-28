@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from .models import Item, Comment
 from .forms import ItemForm, CommentForm
 from django.template import loader
@@ -15,6 +15,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 # used only for function-based views - manually set the pagination
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 # ClassBased View
 class IndexClassView(ListView):
