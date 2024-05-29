@@ -31,6 +31,7 @@ urlpatterns = [
     path('profile/<str:username>/', user_views.profilepage, name='profile'),
     path('ratings/', include('star_ratings.urls', namespace='ratings')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('api/', include('api.urls')),
 ]
 
 # Copy this code from documentation - how to display images in development serve
