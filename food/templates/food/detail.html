@@ -1,23 +1,91 @@
 {% extends 'food/base.html' %}
+{% load ratings %}
 
 {% block body %}
 <div class="container">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <img src="{{ item.item_image }}" height="300px" width="300px" class="card">
         </div>
-        <div class="col-md-6">
-            <h1>{{ object.item_name }}</h1>
-            <h2>{{ object.item_desc }}</h2>
-            <h3>${{ object.item_price }}</h3>
-            {% if user.is_authenticated %}
-            <a href="{% url 'food:update_item' item.id %}">Update</a>
-            <a href="{% url 'food:delete_item' item.id %}">Delete</a>
+        <div class="col-md-8">
+            <h1 class="kur">Recipe: #{{ object.id }}</h1>
+            <div class="card my-4">
+                <div class="card-body">
+                    <h5 class="card-title">{{ object.item_name}}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted"> Author
+                        <a href="{% url 'profile' username=item.user_name  %}">{{ object.user_name }}</a></h6>
+                    <p class="card-text">Description: {{ object.item_desc | safe }}</p>
+                    <p class="card-subtitle mb-2 text-muted">Published on: {{ object.publish_date|date:"d F Y"  }}</p>
+                        {% if object.update_date %}
+                    <p class="card-subtitle mb-2 text-muted">Last updated: {{ object.update_date|date:"d F Y"  }}</p>
+                        {% endif %}
+                    <p class="card-subtitle mb-2 text-muted">Cooking time {{ object.cooking_time }}</p>
+                    <p class="card-subtitle mb-2 text-muted">Views: {{ object.views }}</p>
+
+                </div>
+            </div>
+            {% if item.user_name == user %}
+                <a href="{% url 'food:update_item' item.id %}">Update</a>
+                <a href="{% url 'food:delete_item' item.id %}">Delete</a>
             {% endif %}
         </div>
     </div>
+</div>
+<hr>
+<div class="container">
+     <div class="row">
+         <div class="col-md-4">
+            <h6>
+                {% ratings object %}
+            </h6>
 
+            <h6>Comments</h6>
+                <div id="comments">
+                    <table class="table table-hover">
+                            {% for comment in comments %}
+                                <tr>
+                                    <td>
+                                        <div class="comment">
+                                            <p>{{ comment.text }}</p>
+                                            <p><small>by {{ comment.user.username }} on {{ comment.created_at }}</small></p>
+                                                {% if comment.user == request.user %}
+                                                    <a href="{% url 'food:delete_comment' item_pk=comment.item.pk comment_pk=comment.pk %}" class="btn btn-primary">Delete</a>
+                                                {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td>
+                                        <p>No comments yet.</p>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                 </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ comment_form.as_p }}
+                        {% if comment_form.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                <ul>
+                                    {% for field in comment_form %}
+                                        {% for error in field.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% for error in comment_form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
-
-<!--Intital version -  <h1>{{ item.item_name }}</h1> replaced with object.item_name, etc -->
