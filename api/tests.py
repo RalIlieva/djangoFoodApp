@@ -13,7 +13,12 @@ from rest_framework import status
 
 
 CREATE_USER_URL = reverse('api-register')
-# PROFILE_URL = reverse('profile')
+# PROFILE_URL = reverse('profile-detail')
+
+
+def create_user(**params):
+    """Create and return a new user."""
+    return User.objects.create_user(**params)
 
 class PublicUserApiTests(TestCase):
     """Test public features of the public API."""
@@ -36,3 +41,31 @@ class PublicUserApiTests(TestCase):
             username=payload['username']
         ).exists()
         self.assertTrue(user_exists)
+
+
+class PrivateUserAPITest(TestCase):
+    """Test API that require authentication"""
+
+    def setUp(self):
+        self.user = create_user(
+            username='example',
+            email='example@example.com',
+            password='testpass123',
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def test_retrieve_profile_success(self):
+        """Test retrieving profile for logged in users."""
+        profile_url = reverse('profile-detail', args=[self.user.profile.id])
+        res = self.client.get(profile_url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, {
+            'user': {
+                'id': self.user.id,
+                'username': self.user.username,
+                'email': self.user.email,
+            },
+            'image': f'http://testserver{self.user.profile.image.url}',
+            'location': self.user.profile.location,
+        })
