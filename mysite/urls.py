@@ -60,5 +60,5 @@ urlpatterns = [
 
 # Copy this code from documentation - how to display images in development serve
 urlpatterns += [
-    # ... the rest of your URLconf goes here ...
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
