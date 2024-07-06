@@ -73,13 +73,15 @@ class PrivateUserAPITest(TestCase):
     def test_update_user_profile(self):
         """Test updating user profile"""
         payload = {
-            'user': {''
-                     'email': 'newmail@example.com'
-                     }
-
+            'user': {
+                'email': 'newmail@example.com'
+            },
+            'location': 'new location'
         }
         profile_url = reverse('profile-detail', args=[self.user.profile.id])
         res = self.client.patch(profile_url, payload, format='json')
 
         self.user.refresh_from_db()
         self.assertEqual(self.user.email, payload['user']['email'])
+        self.assertEqual(self.user.profile.location, payload['location'])
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
