@@ -16,6 +16,24 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['user', 'image', 'location']
 
+    def update(self, instance, validated_data):
+        """Partial update of the user profile"""
+        user_data = validated_data.pop('user', None)
+        user = instance.user
+
+        # Update user fields
+        if user_data:
+            for attr, value in user_data.items():
+                setattr(user, attr, value)
+            user.save()
+
+        # Update profile fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
+
 class ItemSerializer(serializers.ModelSerializer):
     user_name = UserSerializer()
 
