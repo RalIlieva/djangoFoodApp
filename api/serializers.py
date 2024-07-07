@@ -9,6 +9,16 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email']
         ref_name = 'ApiUserSerializer'
 
+class ProfileImageSerializer(serializers.ModelSerializer):
+    """Serializer for uploading images to profiles"""
+
+    class Meta:
+        model = Profile
+        fields = ['id', 'image']
+        read_only_fields = ['id']
+        extra_kwargs = {'image': {'required': 'True'}}
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
@@ -20,6 +30,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         """Partial update of the user profile"""
         user_data = validated_data.pop('user', None)
         user = instance.user
+
 
         # Update user fields
         if user_data:
@@ -33,6 +44,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
 
 class ItemSerializer(serializers.ModelSerializer):
     user_name = UserSerializer()
