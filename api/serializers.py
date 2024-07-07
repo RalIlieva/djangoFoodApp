@@ -7,6 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email']
+        read_only_fields = ['id']
         ref_name = 'ApiUserSerializer'
 
 class ProfileImageSerializer(serializers.ModelSerializer):
@@ -16,15 +17,28 @@ class ProfileImageSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['id', 'image']
         read_only_fields = ['id']
-        extra_kwargs = {'image': {'required': 'True'}}
+        extra_kwargs = {
+            'image': {'required': 'True'},
+            'user': {'required': False},
+            'location': {'required': False}
+        }
 
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    # image = ProfileImageSerializer
 
     class Meta:
         model = Profile
         fields = ['user', 'image', 'location']
+        read_only_fields = ['id']
+
+    def create(self, validated_data):
+        """Create and return a new profile"""
+        user_data = validated_data.pop('user')
+        user = User.objects.create_user(**user_data)
+        profile = Profile.objects.create(user=user, **validated_data)
+        return profile
 
     def update(self, instance, validated_data):
         """Partial update of the user profile"""
@@ -52,6 +66,7 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id', 'user_name', 'item_name', 'item_desc', 'item_image', 'publish_date', 'update_date', 'cooking_time', 'views']
+        read_only_fields = ['id']
 
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializer()
@@ -60,3 +75,4 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'user', 'item', 'text', 'created_at']
+        read_only_fields = ['id']

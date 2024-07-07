@@ -1,7 +1,9 @@
 """
 Create tests for the API.
 """
-
+import tempfile
+import os
+from PIL import Image
 from django.test import TestCase
 from django.contrib.auth.models import User
 from food.models import Item, Comment
@@ -11,6 +13,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
+from api.serializers import UserSerializer, ProfileSerializer, ProfileImageSerializer
 
 CREATE_USER_URL = reverse('api-register')
 # PROFILE_URL = reverse('profile-detail')
@@ -85,3 +88,37 @@ class PrivateUserAPITest(TestCase):
         self.assertEqual(self.user.email, payload['user']['email'])
         self.assertEqual(self.user.profile.location, payload['location'])
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+
+class ImageUploadTests(TestCase):
+    """Tests for the image upload API."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user(
+            username='example',
+            email='example@example.com',
+            password='testpass123',
+        )
+        self.client.force_authenticate(self.user)
+
+
+    def tearDown(self):
+        self.user.profile.image.delete()
+
+    def test_upload_image(self):
+        """Test uploading an image to a profile user."""
+        url = reverse('upload-image', args=[self.user.profile.id])
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as image_file:
+            img = Image.new('RGB', (10, 10))
+            img.save(image_file, format='JPEG')
+            image_file.seek(0)
+            payload = {'image': image_file}
+            res = self.client.post(url, payload, format='multipart')
+
+        self.user.profile.refresh_from_db()
+        if res.status_code != status.HTTP_200_OK:
+            print(res.content)  # Print response content for debugging
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('image', res.data)
+        self.assertTrue(os.path.exists(self.user.profile.image.path))
