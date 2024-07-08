@@ -3,6 +3,7 @@ Create tests for the API.
 """
 import tempfile
 import os
+from datetime import timedelta
 from PIL import Image
 from django.test import TestCase
 from django.contrib.auth.models import User
@@ -33,10 +34,10 @@ def create_item(user, **params):
         'item_name': 'Sample Recipe',
         'item_desc': 'Sample description',
         'item_image': 'https://cdn-icons-png.flaticon.com/512/1147/1147805.png',
-        'cooking_time': '00:30:00',
+        'cooking_time': timedelta(minutes=30),
     }
     defaults.update(params)
-    item = Item.objects.create(user=user, **defaults)
+    item = Item.objects.create(user_name=user, **defaults)
     return item
 
 
@@ -147,7 +148,21 @@ class PublicRecipeApi(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-    def test_auth_required(self):
+    def test_auth_not_required_index(self):
         """Test auth is not required to call API."""
         res = self.client.get(ITEM_LIST_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_auth_not_required_detail(self):
+        """Test auth is not required to view detail recipe."""
+        self.user = create_user(
+            username='User',
+            email='user@example.com',
+            password='testpass123',
+        )
+        item = create_item(user=self.user)
+
+        url = detail_url(item.id)
+        res = self.client.get(url)
+
         self.assertEqual(res.status_code, status.HTTP_200_OK)
