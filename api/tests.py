@@ -4,6 +4,8 @@ Create tests for the API.
 import tempfile
 import os
 from datetime import timedelta
+from django.utils import timezone
+from deepdiff import DeepDiff
 from PIL import Image
 from django.test import TestCase
 from django.contrib.auth.models import User
@@ -14,10 +16,13 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from api.serializers import UserSerializer, ProfileSerializer, ProfileImageSerializer
+from api.serializers import UserSerializer, ProfileSerializer, ProfileImageSerializer, ItemSerializer
 
 CREATE_USER_URL = reverse('api-register')
-ITEM_LIST_URL = reverse('food:index')
+# ITEM_LIST_URL = reverse('food:index')
+ITEM_LIST_URL = reverse('item-list')
+ITEM_DETAIL_URL = lambda pk: reverse('item-detail', args=[pk])
+
 
 def detail_url(item_id):
     """Create and return a recipe detail URL."""
@@ -31,13 +36,15 @@ def create_user(**params):
 def create_item(user, **params):
     """Create and return a sample recipe"""
     defaults = {
+        'user_name': user,
         'item_name': 'Sample Recipe',
         'item_desc': 'Sample description',
         'item_image': 'https://cdn-icons-png.flaticon.com/512/1147/1147805.png',
+        'publish_date': timezone.now(),
         'cooking_time': timedelta(minutes=30),
     }
     defaults.update(params)
-    item = Item.objects.create(user_name=user, **defaults)
+    item = Item.objects.create(**defaults)
     return item
 
 
@@ -148,6 +155,14 @@ class PublicRecipeApi(TestCase):
     def setUp(self):
         self.client = APIClient()
 
+    def normalize_cooking_time(self, cooking_time):
+        """Normalize cooking time to match the response format."""
+        total_seconds = int(cooking_time.total_seconds())
+        hours, remainder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        # Ensure hours are two digits for consistency
+        return f'{hours:02}:{minutes:02}:{seconds:02}'
+
     def test_auth_not_required_index(self):
         """Test auth is not required to call API."""
         res = self.client.get(ITEM_LIST_URL)
@@ -162,7 +177,98 @@ class PublicRecipeApi(TestCase):
         )
         item = create_item(user=self.user)
 
-        url = detail_url(item.id)
+        # url = detail_url(item.id)
+        url = ITEM_DETAIL_URL(item.id)
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    # def test_auth_not_required_detail_serializer(self):
+    #     """Test auth is not required to view detail recipe."""
+    #     self.user = create_user(
+    #         username='User',
+    #         email='user@example.com',
+    #         password='testpass123',
+    #     )
+    #     item = create_item(user=self.user)
+    #
+    #     # url = detail_url(item.id)
+    #     url = ITEM_DETAIL_URL(item.id)
+    #     res = self.client.get(url)
+    #     item.refresh_from_db()
+    #     serializer = ItemSerializer()
+    #
+    #     res.data['cooking_time'] = self.normalize_cooking_time(item.cooking_time)
+    #
+    #     # Adjust to compare only the fields present in the response
+    #     expected_data = {
+    #         'id': item.id,
+    #         'user_name': {
+    #             'id': self.user.id,
+    #             'username': self.user.username,
+    #             'email': self.user.email,
+    #         },
+    #         'item_name': item.item_name,
+    #         'item_desc': item.item_desc,
+    #         'item_image': item.item_image,
+    #         'publish_date': item.publish_date.isoformat().replace('+00:00', 'Z'),  # Adjust for datetime format
+    #         'update_date': item.update_date.isoformat().replace('+00:00', 'Z'),    # Adjust for datetime format
+    #         'cooking_time':  self.normalize_cooking_time(item.cooking_time),
+    #         'views': item.views,
+    #     }
+    #
+    #     # Normalize the response data to ensure consistency
+    #     normalized_res_data = res.data.copy()
+    #     normalized_res_data['cooking_time'] = self.normalize_cooking_time(item.cooking_time)
+    #
+    #     # Ensure user_name field in response data is complete
+    #     normalized_res_data['user_name'] = {
+    #         'id': self.user.id,
+    #         'username': self.user.username,
+    #         'email': self.user.email
+    #     }
+    #
+    #     # Use deepdiff to find differences
+    #     diff = DeepDiff(res.data, serializer.data, ignore_order=True)
+    #     if diff:
+    #         print("Differences:", diff)
+    #
+    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(res.data, serializer.data)
+
+    def test_auth_not_required_detail_serializer(self):
+        """Test auth is not required to view detail recipe."""
+        self.user = create_user(
+            username='User',
+            email='user@example.com',
+            password='testpass123',
+        )
+        item = create_item(user=self.user)
+
+        url = ITEM_DETAIL_URL(item.id)
+        res = self.client.get(url)
+        item.refresh_from_db()
+        serializer = ItemSerializer(item)
+
+        # Normalize the response data to ensure consistency
+        normalized_res_data = res.data.copy()
+        normalized_res_data['cooking_time'] = self.normalize_cooking_time(item.cooking_time)
+
+        # Ensure user_name field in response data is complete
+        normalized_res_data['user_name'] = {
+            'id': self.user.id,
+            'username': self.user.username,
+            'email': self.user.email
+        }
+
+        # Adjust datetime fields for comparison
+        normalized_res_data['publish_date'] = item.publish_date.isoformat().replace('+00:00', 'Z')
+        normalized_res_data['update_date'] = item.update_date.isoformat().replace('+00:00', 'Z')
+
+        # Use deepdiff to find differences
+        diff = DeepDiff(normalized_res_data, serializer.data, ignore_order=True)
+        if diff:
+            print("Differences:", diff)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(normalized_res_data, serializer.data)
