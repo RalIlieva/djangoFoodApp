@@ -16,12 +16,29 @@ from rest_framework import status
 from api.serializers import UserSerializer, ProfileSerializer, ProfileImageSerializer
 
 CREATE_USER_URL = reverse('api-register')
-# PROFILE_URL = reverse('profile-detail')
+ITEM_LIST_URL = reverse('food:index')
 
+def detail_url(item_id):
+    """Create and return a recipe detail URL."""
+    return reverse('food:detail', args=[item_id])
 
 def create_user(**params):
     """Create and return a new user."""
     return User.objects.create_user(**params)
+
+
+def create_item(user, **params):
+    """Create and return a sample recipe"""
+    defaults = {
+        'item_name': 'Sample Recipe',
+        'item_desc': 'Sample description',
+        'item_image': 'https://cdn-icons-png.flaticon.com/512/1147/1147805.png',
+        'cooking_time': '00:30:00',
+    }
+    defaults.update(params)
+    item = Item.objects.create(user=user, **defaults)
+    return item
+
 
 class PublicUserApiTests(TestCase):
     """Test public features of the public API."""
@@ -122,3 +139,15 @@ class ImageUploadTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn('image', res.data)
         self.assertTrue(os.path.exists(self.user.profile.image.path))
+
+
+class PublicRecipeApi(TestCase):
+    """Test unauthenticated API clients get list view."""
+
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_auth_required(self):
+        """Test auth is not required to call API."""
+        res = self.client.get(ITEM_LIST_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
