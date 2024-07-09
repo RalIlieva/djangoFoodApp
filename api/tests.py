@@ -48,6 +48,16 @@ def create_item(user, **params):
     return item
 
 
+def normalize_cooking_time(cooking_time):
+    """Normalize cooking time to match the response format."""
+    if isinstance(cooking_time, str):
+        return cooking_time
+    total_seconds = int(cooking_time.total_seconds())
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f'{hours:02}:{minutes:02}:{seconds:02}'
+
+
 class PublicUserApiTests(TestCase):
     """Test public features of the public API."""
 
@@ -272,3 +282,32 @@ class PublicRecipeApi(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(normalized_res_data, serializer.data)
+
+class PrivateRecipeApiTests(TestCase):
+    """Test authenticated API clients get list view."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user(
+            username='RaliTheTester',
+            email='example@example.com',
+            password='testpass123',
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_retrieve_recipes(self):
+        """Test retrieving a list of recipes"""
+        create_item(user=self.user)
+        create_item(user=self.user)
+
+        url = ITEM_LIST_URL
+        items = Item.objects.all().order_by('id')
+        serializer = ItemSerializer(items, many=True)
+        res = self.client.get(url)
+
+        for item in res.data:
+            item['cooking_time'] = normalize_cooking_time(item['cooking_time'])
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
+
