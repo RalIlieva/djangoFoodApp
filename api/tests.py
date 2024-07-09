@@ -311,3 +311,23 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
+    def test_recipe_list_all_to_user(self):
+        """Test list of all recipes is retrieved by the authenticated user."""
+        other_user = create_user(
+            username='OtherUser',
+            email='other@example.com',
+            password='password123',
+        )
+        create_item(user=other_user, item_name='OtherUser Recipe')
+        create_item(user=self.user, item_name='User Recipe')
+
+        res = self.client.get(ITEM_LIST_URL)
+        items = Item.objects.all()
+        serializer = ItemSerializer(items, many=True)
+
+        for item in res.data:
+            item['cooking_time'] = normalize_cooking_time(item['cooking_time'])
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
+
