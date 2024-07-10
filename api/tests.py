@@ -3,8 +3,9 @@ Create tests for the API.
 """
 import tempfile
 import os
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.utils import timezone
+import pytz
 from deepdiff import DeepDiff
 from PIL import Image
 from django.test import TestCase
@@ -12,6 +13,7 @@ from django.contrib.auth.models import User
 from food.models import Item, Comment
 from users.models import Profile
 from django.urls import reverse
+
 
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -340,3 +342,32 @@ class PrivateRecipeApiTests(TestCase):
         serializer = ItemSerializer(item)
 
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_recipe(self):
+        """Test creating a recipe"""
+        payload = {
+            'item_name': 'Bean Soup',
+            'item_desc': 'Delicious soup made of beans',
+            'item_image': 'https://example.png',
+            'publish_date': timezone.now().isoformat(),
+            'cooking_time': '00:15:00',
+        }
+        res = self.client.post(ITEM_LIST_URL, payload)
+        if res.status_code != status.HTTP_201_CREATED:
+            print('Response content:', res.content)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        item = Item.objects.get(id=res.data['id'])
+        for key, value in payload.items():
+            if key == 'publish_date':
+                # Convert string to datetime for comparison
+                value = datetime.fromisoformat(value).replace(tzinfo=pytz.UTC)
+            elif key == 'cooking_time':
+                # Convert string to timedelta for comparison
+                value = timedelta(
+                    hours=int(value.split(':')[0]),
+                    minutes=int(value.split(':')[1]),
+                    seconds=int(value.split(':')[2]),
+                )
+            self.assertEqual(getattr(item, key), value)
+        self.assertEqual(item.user_name, self.user)
