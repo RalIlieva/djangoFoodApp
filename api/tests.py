@@ -371,3 +371,22 @@ class PrivateRecipeApiTests(TestCase):
                 )
             self.assertEqual(getattr(item, key), value)
         self.assertEqual(item.user_name, self.user)
+
+    def test_partial_update_recipe(self):
+        """Test partial update of a recipe"""
+        original_link = 'https://example.com/recipe.pdf'
+        item = create_item(
+            user=self.user,
+            item_name='Sample Recipe',
+            item_image=original_link
+        )
+
+        payload = {'item_name': 'Updated Recipe Name'}
+        url = ITEM_DETAIL_URL(item.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        item.refresh_from_db()
+        self.assertEqual(item.item_name, payload['item_name'])
+        self.assertEqual(item.item_image, original_link)
+        self.assertEqual(item.user_name, self.user)
