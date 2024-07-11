@@ -390,3 +390,27 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(item.item_name, payload['item_name'])
         self.assertEqual(item.item_image, original_link)
         self.assertEqual(item.user_name, self.user)
+
+    def test_recipe_full_update(self):
+        """Test recipe full update."""
+        item = create_item(
+            user=self.user,
+            item_name='Lentils Soup',
+            item_desc='Sample lentils soup',
+            item_image='https://example.com/recipe/images.png',
+        )
+        payload = {
+            'item_name': 'Lentils Meal with Beans',
+            'item_desc':'Delicious vegan mean',
+            'item_image':'https://example.com/recipe/newimage.png',
+            'publish_date': timezone.now(),
+            'cooking_time': timedelta(minutes=12),
+        }
+        url = ITEM_DETAIL_URL(item.id)
+        res = self.client.put(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        item.refresh_from_db()
+        for k, v in payload.items():
+            self.assertEqual(getattr(item, k), v)
+        self.assertEqual(item.user_name, self.user)
