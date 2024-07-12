@@ -13,6 +13,7 @@ from .serializers import (
     ProfileImageSerializer,
 )
 
+from .permissions import IsOwnerOrReadOnly
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -49,7 +50,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(user_name=self.request.user)
@@ -57,7 +58,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 class RegisterApiView(generics.CreateAPIView):
