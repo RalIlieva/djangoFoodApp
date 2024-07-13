@@ -420,3 +420,16 @@ class PrivateRecipeApiTests(TestCase):
         # Check that the comment is included in the response
         comment_data = CommentSerializer(comment_sample).data
         self.assertIn(comment_data, res.data['comments'])
+
+    def test_create_comment(self):
+        """Test creating a comment."""
+        self.item = create_item(user=self.user)
+        payload = {
+            'text': 'Test comment - hooray',
+            'item': self.item.id,
+        }
+        res = self.client.post(reverse('comment-list'), payload)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Comment.objects.count(), 1)
+        self.assertEqual(Comment.objects.get().text, payload['text'])
+        self.assertEqual(Comment.objects.get().user, self.user)

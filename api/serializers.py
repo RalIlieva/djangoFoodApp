@@ -69,6 +69,12 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'item', 'text', 'created_at']
         read_only_fields = ['id']
 
+    def create(self, validated_data):
+        request = self.context.get('request', None)
+        if request and request.user:
+            validated_data['user'] = request.user
+        return super().create(validated_data)
+
 
 class ItemSerializer(serializers.ModelSerializer):
     user_name = UserSerializer(read_only=True)
