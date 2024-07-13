@@ -3,12 +3,14 @@ from food.models import Item, Comment
 from users.models import Profile
 from django.contrib.auth.models import User
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email']
         read_only_fields = ['id']
         ref_name = 'ApiUserSerializer'
+
 
 class ProfileImageSerializer(serializers.ModelSerializer):
     """Serializer for uploading images to profiles"""
@@ -45,7 +47,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         user_data = validated_data.pop('user', None)
         user = instance.user
 
-
         # Update user fields
         if user_data:
             for attr, value in user_data.items():
@@ -60,26 +61,41 @@ class ProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'user', 'item', 'text', 'created_at']
+        read_only_fields = ['id']
+
+
 class ItemSerializer(serializers.ModelSerializer):
     user_name = UserSerializer(read_only=True)
+    comments = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
-        fields = ['id', 'user_name', 'item_name', 'item_desc', 'item_image', 'publish_date', 'update_date', 'cooking_time', 'views']
+        fields = [
+            'id',
+            'user_name',
+            'item_name',
+            'item_desc',
+            'item_image',
+            'publish_date',
+            'update_date',
+            'cooking_time',
+            'views',
+            'comments',
+        ]
         read_only_fields = ['id', 'user_name']
+
+    def get_comments(self, obj):
+        comments = obj.comments.all()
+        return CommentSerializer(comments, many=True).data
 
     def create(self, validated_data):
         request = self.context.get('request', None)
         if request:
             validated_data['user_name'] = request.user
         return super().create(validated_data)
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    item = ItemSerializer()
-
-    class Meta:
-        model = Comment
-        fields = ['id', 'user', 'item', 'text', 'created_at']
-        read_only_fields = ['id']

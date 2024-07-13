@@ -17,8 +17,14 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient
 from rest_framework import status
+from api.serializers import (
+    UserSerializer,
+    ProfileImageSerializer,
+    ProfileSerializer,
+    ItemSerializer,
+    CommentSerializer,
+)
 
-from api.serializers import UserSerializer, ProfileSerializer, ProfileImageSerializer, ItemSerializer
 
 CREATE_USER_URL = reverse('api-register')
 # ITEM_LIST_URL = reverse('food:index')
@@ -195,58 +201,6 @@ class PublicRecipeApi(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-    # def test_auth_not_required_detail_serializer(self):
-    #     """Test auth is not required to view detail recipe."""
-    #     self.user = create_user(
-    #         username='User',
-    #         email='user@example.com',
-    #         password='testpass123',
-    #     )
-    #     item = create_item(user=self.user)
-    #
-    #     # url = detail_url(item.id)
-    #     url = ITEM_DETAIL_URL(item.id)
-    #     res = self.client.get(url)
-    #     item.refresh_from_db()
-    #     serializer = ItemSerializer()
-    #
-    #     res.data['cooking_time'] = self.normalize_cooking_time(item.cooking_time)
-    #
-    #     # Adjust to compare only the fields present in the response
-    #     expected_data = {
-    #         'id': item.id,
-    #         'user_name': {
-    #             'id': self.user.id,
-    #             'username': self.user.username,
-    #             'email': self.user.email,
-    #         },
-    #         'item_name': item.item_name,
-    #         'item_desc': item.item_desc,
-    #         'item_image': item.item_image,
-    #         'publish_date': item.publish_date.isoformat().replace('+00:00', 'Z'),  # Adjust for datetime format
-    #         'update_date': item.update_date.isoformat().replace('+00:00', 'Z'),    # Adjust for datetime format
-    #         'cooking_time':  self.normalize_cooking_time(item.cooking_time),
-    #         'views': item.views,
-    #     }
-    #
-    #     # Normalize the response data to ensure consistency
-    #     normalized_res_data = res.data.copy()
-    #     normalized_res_data['cooking_time'] = self.normalize_cooking_time(item.cooking_time)
-    #
-    #     # Ensure user_name field in response data is complete
-    #     normalized_res_data['user_name'] = {
-    #         'id': self.user.id,
-    #         'username': self.user.username,
-    #         'email': self.user.email
-    #     }
-    #
-    #     # Use deepdiff to find differences
-    #     diff = DeepDiff(res.data, serializer.data, ignore_order=True)
-    #     if diff:
-    #         print("Differences:", diff)
-    #
-    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(res.data, serializer.data)
 
     def test_auth_not_required_detail_serializer(self):
         """Test auth is not required to view detail recipe."""
@@ -452,3 +406,17 @@ class PrivateRecipeApiTests(TestCase):
         res = self.client.delete(url)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(Item.objects.filter(id=item.id).exists())
+
+    def test_comment_list_to_recipe(self):
+        """Test viewing comments to a recipe"""
+        item = create_item(user=self.user)
+        comment_sample = Comment.objects.create(user=self.user, item=item, text='Sample comment')
+        item.comments.add(comment_sample)
+        url = ITEM_DETAIL_URL(item.id)
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # Check that the comment is included in the response
+        comment_data = CommentSerializer(comment_sample).data
+        self.assertIn(comment_data, res.data['comments'])
