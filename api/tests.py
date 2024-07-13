@@ -453,3 +453,17 @@ class PrivateRecipeApiTests(TestCase):
         res = self.client.delete(url)
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Comment.objects.filter(id=comment.id).exists())
+
+    def test_update_other_user_comment_error(self):
+        """Test that trying to update another user's comment returns an error"""
+        new_user = create_user(
+            username='newuser',
+            email='new@example.com',
+            password='newpass123'
+        )
+        self.item = create_item(user=self.user)
+        comment = Comment.objects.create(user=new_user, item=self.item, text='Another user comment')
+        payload = {'text': 'Updated comment'}
+        url = reverse('comment-detail', args=[comment.id])
+        res = self.client.patch(url, payload)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
