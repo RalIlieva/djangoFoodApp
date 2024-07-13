@@ -444,3 +444,12 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         comment.refresh_from_db()
         self.assertEqual(comment.text, payload['text'])
+
+    def test_delete_comment(self):
+        """Test deleting a comment"""
+        self.item = create_item(user=self.user)
+        comment = Comment.objects.create(user=self.user, item=self.item, text='Sample comment')
+        url = reverse('comment-detail', args=[comment.id])
+        res = self.client.delete(url)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Comment.objects.filter(id=comment.id).exists())
