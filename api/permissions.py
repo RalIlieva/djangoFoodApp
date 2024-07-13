@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from food.models import Item, Comment
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
@@ -12,4 +13,8 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
 
         # Write permissions are only allowed to the owner of the object.
-        return obj.user_name == request.user
+        if isinstance(obj, Item):
+            return obj.user_name == request.user
+        elif isinstance(obj, Comment):
+            return obj.user == request.user
+        return False

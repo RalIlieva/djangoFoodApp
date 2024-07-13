@@ -433,3 +433,14 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(Comment.objects.count(), 1)
         self.assertEqual(Comment.objects.get().text, payload['text'])
         self.assertEqual(Comment.objects.get().user, self.user)
+
+    def test_update_comment(self):
+        """Test updating a comment"""
+        self.item = create_item(user=self.user)
+        comment = Comment.objects.create(user=self.user, item=self.item, text='Initial comment')
+        payload = {'text': 'Updated comment'}
+        url = reverse('comment-detail', args=[comment.id])
+        res = self.client.patch(url, payload)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        comment.refresh_from_db()
+        self.assertEqual(comment.text, payload['text'])
