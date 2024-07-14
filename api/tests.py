@@ -37,6 +37,7 @@ def detail_url(item_id):
     """Create and return a recipe detail URL."""
     return reverse('food:detail', args=[item_id])
 
+
 def create_user(**params):
     """Create and return a new user."""
     return User.objects.create_user(**params)
@@ -146,7 +147,6 @@ class ImageUploadTests(TestCase):
         )
         self.client.force_authenticate(self.user)
 
-
     def tearDown(self):
         self.user.profile.image.delete()
 
@@ -202,7 +202,6 @@ class PublicRecipeApi(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-
     def test_auth_not_required_detail_serializer(self):
         """Test auth is not required to view detail recipe."""
         self.user = create_user(
@@ -239,6 +238,7 @@ class PublicRecipeApi(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(normalized_res_data, serializer.data)
+
 
 class PrivateRecipeApiTests(TestCase):
     """Test authenticated API clients get list view."""
@@ -356,8 +356,8 @@ class PrivateRecipeApiTests(TestCase):
         )
         payload = {
             'item_name': 'Lentils Meal with Beans',
-            'item_desc':'Delicious vegan mean',
-            'item_image':'https://example.com/recipe/newimage.png',
+            'item_desc': 'Delicious vegan mean',
+            'item_image': 'https://example.com/recipe/newimage.png',
             'publish_date': timezone.now(),
             'cooking_time': timedelta(minutes=12),
         }
