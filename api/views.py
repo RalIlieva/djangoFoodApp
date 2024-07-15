@@ -11,9 +11,15 @@ from .serializers import (
     ProfileSerializer,
     UserSerializer,
     ProfileImageSerializer,
+    MyTokenObtainPairSerializer,
 )
 
 from .permissions import IsOwnerOrReadOnly
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
