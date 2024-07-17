@@ -16,6 +16,7 @@ from .serializers import (
 
 from .permissions import IsOwnerOrReadOnly
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.authentication import TokenAuthentication
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -30,6 +31,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [TokenAuthentication]
 
     def get_serializer_class(self):
         """Return the serializer class for request."""
@@ -65,6 +67,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    # permission_classes = [permissions.AllowAny]
+    # authentication_classes = [TokenAuthentication]
 
 
 class RegisterApiView(generics.CreateAPIView):
