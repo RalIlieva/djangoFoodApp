@@ -52,7 +52,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['user', 'image', 'location']
+        fields = ['id', 'user', 'image', 'location']
         read_only_fields = ['id']
 
     def create(self, validated_data):
