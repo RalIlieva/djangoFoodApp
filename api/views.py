@@ -30,8 +30,8 @@ class UserViewSet(viewsets.ModelViewSet):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    # authentication_classes = [TokenAuthentication]
 
     def get_serializer_class(self):
         """Return the serializer class for request."""

@@ -1,5 +1,7 @@
 from rest_framework import permissions
 from food.models import Item, Comment
+from users.models import Profile
+
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
@@ -16,5 +18,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if isinstance(obj, Item):
             return obj.user_name == request.user
         elif isinstance(obj, Comment):
+            return obj.user == request.user
+        elif isinstance(obj, Profile):
             return obj.user == request.user
         return False
