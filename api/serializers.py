@@ -114,7 +114,7 @@ class ItemSerializer(serializers.ModelSerializer):
             'views',
             'comments',
         ]
-        read_only_fields = ['id', 'user_name']
+        read_only_fields = ['id', 'user_name', 'publish_date', 'update_date', 'views',]
 
     def get_comments(self, obj):
         comments = obj.comments.all()
