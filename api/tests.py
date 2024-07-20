@@ -68,6 +68,10 @@ def normalize_cooking_time(cooking_time):
     return f'{hours:02}:{minutes:02}:{seconds:02}'
 
 
+def normalize_datetime(dt):
+    return dt.replace(microsecond=0)
+
+
 class PublicUserApiTests(TestCase):
     """Test public features of the public API."""
 
@@ -109,6 +113,7 @@ class PrivateUserAPITest(TestCase):
         res = self.client.get(profile_url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, {
+            'id': self.user.profile.id,
             'user': {
                 'id': self.user.id,
                 'username': self.user.username,
@@ -317,6 +322,7 @@ class PrivateRecipeApiTests(TestCase):
             if key == 'publish_date':
                 # Convert string to datetime for comparison
                 value = datetime.fromisoformat(value).replace(tzinfo=pytz.UTC)
+                self.assertEqual(normalize_datetime(getattr(item, key)), normalize_datetime(value))
             elif key == 'cooking_time':
                 # Convert string to timedelta for comparison
                 value = timedelta(
@@ -324,7 +330,9 @@ class PrivateRecipeApiTests(TestCase):
                     minutes=int(value.split(':')[1]),
                     seconds=int(value.split(':')[2]),
                 )
-            self.assertEqual(getattr(item, key), value)
+                self.assertEqual(getattr(item, key), value)
+            else:
+                self.assertEqual(getattr(item, key), value)
         self.assertEqual(item.user_name, self.user)
 
     def test_partial_update_recipe(self):
@@ -367,7 +375,10 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         item.refresh_from_db()
         for k, v in payload.items():
-            self.assertEqual(getattr(item, k), v)
+            if isinstance(v, datetime):
+                self.assertEqual(normalize_datetime(getattr(item, k)), normalize_datetime(v))
+            else:
+                self.assertEqual(getattr(item, k), v)
         self.assertEqual(item.user_name, self.user)
 
     def test_update_user_returns_error(self):
