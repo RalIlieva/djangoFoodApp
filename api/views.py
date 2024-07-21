@@ -17,7 +17,7 @@ from .serializers import (
 from .permissions import IsOwnerOrReadOnly
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework.authentication import TokenAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -38,12 +38,13 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication]
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-    # authentication_classes = [TokenAuthentication]
+    authentication_classes = [JWTAuthentication]
 
     def get_serializer_class(self):
         """Return the serializer class for request."""
@@ -71,6 +72,7 @@ class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    authentication_classes = [JWTAuthentication]
 
     def perform_create(self, serializer):
         serializer.save(user_name=self.request.user)
@@ -79,8 +81,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-    # permission_classes = [permissions.AllowAny]
-    # authentication_classes = [TokenAuthentication]
+    authentication_classes = [JWTAuthentication]
 
 
 class RegisterApiView(generics.CreateAPIView):
