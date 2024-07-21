@@ -10,12 +10,16 @@ from food.models import Item
 
 def register(request):
     if request.method == 'POST':
+        print('Form submitted')
         form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
+            print(f'User {username} created successfully')
             messages.success(request, f'Welcome {username}, your account is created!')
             return redirect('login')
+        else:
+            print('Form is not valid', form.errors)
     else:
         form = RegisterForm()
     return render(request, 'users/register.html', {'form': form})

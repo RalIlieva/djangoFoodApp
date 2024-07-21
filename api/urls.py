@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserViewSet, ProfileViewSet, ItemViewSet, CommentViewSet
+from .views import UserViewSet, ProfileViewSet, ItemViewSet, CommentViewSet, RegisterApiView
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -10,4 +10,6 @@ router.register(r'comments', CommentViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('register/', RegisterApiView.as_view(), name='api-register'),
+    path('profiles/<int:pk>/upload-image/', ProfileViewSet.upload_image, name='upload-image'),
 ]

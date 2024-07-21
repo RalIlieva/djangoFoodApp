@@ -66,6 +66,9 @@ class FoodDetail(DetailView):
         item = self.object
         comment_form = CommentForm(request.POST)
 
+        if not request.user.is_authenticated:
+            return HttpResponseForbidden("You must be logged in to leave a comment.")
+
         if comment_form.is_valid():
             comment = comment_form.save(commit=False)
             comment.user = request.user

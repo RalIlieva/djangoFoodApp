@@ -53,6 +53,7 @@ urlpatterns = [
     path('api/auth/', include('djoser.urls')),
     path('api/auth/', include('djoser.urls.jwt')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
@@ -60,5 +61,5 @@ urlpatterns = [
 
 # Copy this code from documentation - how to display images in development serve
 urlpatterns += [
-    # ... the rest of your URLconf goes here ...
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
