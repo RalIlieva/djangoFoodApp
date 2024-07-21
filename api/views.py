@@ -11,12 +11,24 @@ from .serializers import (
     ProfileSerializer,
     UserSerializer,
     ProfileImageSerializer,
-    MyTokenObtainPairSerializer,
+    UserSerializerWithToken,
 )
 
 from .permissions import IsOwnerOrReadOnly
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.authentication import TokenAuthentication
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        serializer = UserSerializerWithToken(self.user).data
+        for k, v in serializer.items():
+            data[k] = v
+
+        return data
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -72,7 +84,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class RegisterApiView(generics.CreateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = UserSerializerWithToken
     permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
